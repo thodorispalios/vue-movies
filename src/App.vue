@@ -8,7 +8,7 @@
 </div>
   <div class="container">
     <div class="list" v-for="(post, index) in posts.Search" :key="index">
-      <div class="list-item" @click="itemToShow =index, toggleShow()">
+      <div class="list-item" @click="itemToShow =index, toggleShow(), getDetailedData(index)">
         <img v-if="post.Poster!=='N/A'" :src=post.Poster alt="poster-image">
         <img v-else src="./assets/no-image.jpeg" >
         <div class="description">
@@ -20,9 +20,9 @@
         <img v-if="post.Poster!=='N/A'" :src=post.Poster alt="poster-image">
         <img v-else src="./assets/no-image.jpeg" >
           <div class="detailed-description">
-            <h3 v-if="post.Title">Title : {{post.Title}}</h3>
-            <p v-if="post.Plot">Plot : {{post.Plot}}</p>
-            <p v-if="post.imdbID">Link : <a :href="'https://imdb.com/title/' + post.imdbID">IMDb</a></p>
+            <h3 v-if="details.Title">Title : {{details.Title}}</h3>
+            <p v-if="details.Plot">Plot : {{details.Plot}}</p>
+            <p v-if="details.imdbID">Link : <a :href="'https://imdb.com/title/' + details.imdbID">IMDb</a></p>
           </div>
     </div>
     </div>
@@ -54,7 +54,6 @@ export default {
       }
     },
     async getDetailedData() {
-      if (this.isVisible) {
         try {
           let response = await fetch('https://www.omdbapi.com/?t='+ this.searchTerm + '&apikey=' + this.apiKey) 
           this.details = await response.json()
@@ -62,7 +61,6 @@ export default {
         } catch (error) {
           console.log(error)
         }
-      }
     },
     toggleShow(){
       this.isVisible = !this.isVisible
@@ -133,7 +131,11 @@ export default {
     }
   }
   .details{
-    background-color: rgba(150, 150, 150, 0.1);    
+    background-color: rgba(150, 150, 150, 0.1);
+    display: flex;
+    padding: 10px;
+    width: 50%;
+
     .detailed-description {
       padding: 10px;
 
