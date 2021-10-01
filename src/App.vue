@@ -8,7 +8,7 @@
 </div>
   <div class="container">
     <div class="list" v-for="(post, index) in posts.Search" :key="index">
-      <div class="list-item" >
+      <div class="list-item" @click="itemToShow =index, toggleShow()">
         <img v-if="post.Poster!=='N/A'" :src=post.Poster alt="poster-image">
         <img v-else src="./assets/no-image.jpeg" >
         <div class="description">
@@ -16,6 +16,15 @@
           <p>{{ post.Year }}</p>
         </div>
       </div>
+      <div v-if="itemToShow == index" class="details" v-show="isVisible">
+        <img v-if="post.Poster!=='N/A'" :src=post.Poster alt="poster-image">
+        <img v-else src="./assets/no-image.jpeg" >
+          <div class="detailed-description">
+            <h3 v-if="post.Title">Title : {{post.Title}}</h3>
+            <p v-if="post.Plot">Plot : {{post.Plot}}</p>
+            <p v-if="post.imdbID">Link : <a :href="'https://imdb.com/title/' + post.imdbID">IMDb</a></p>
+          </div>
+    </div>
     </div>
   </div>
 </template>
@@ -29,8 +38,12 @@ export default {
       currentPage: 1,
       apiKey: 'f9422ce0',
       searchTerm: 'superhero',
-    }
+      itemToShow: -1,
+      isVisible: false,
+      details: []
+    };
   },
+
   methods: {
     async getData() {
       try {
@@ -40,6 +53,20 @@ export default {
         console.log(error)
       }
     },
+    async getDetailedData() {
+      if (this.isVisible) {
+        try {
+          let response = await fetch('https://www.omdbapi.com/?t='+ this.searchTerm + '&apikey=' + this.apiKey) 
+          this.details = await response.json()
+          console.log(this.details)
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    },
+    toggleShow(){
+      this.isVisible = !this.isVisible
+    }
   },
   watch: {
     currentPage(value, oldValue) {
@@ -54,7 +81,7 @@ export default {
   created() {
     this.getData();
   },
-}
+};
 </script>
 
 <style lang="scss">
@@ -105,6 +132,13 @@ export default {
       }
     }
   }
+  .details{
+    background-color: rgba(150, 150, 150, 0.1);    
+    .detailed-description {
+      padding: 10px;
+
+    } 
+  }
 }
 .pager {
     padding: 10px;
@@ -133,6 +167,6 @@ export default {
           background-color: rgba(48, 48, 48, 0.7);
         }
     }
-    }
+  }
 }
 </style>
